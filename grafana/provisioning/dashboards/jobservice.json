@@ -1,0 +1,35 @@
+{
+  "title": "JobService",
+  "uid": "jobservice",
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Events Consumed Total",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "sum by (topic) (rate(events_consumed_total[1m]))",
+          "legendFormat": "{{topic}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Consumer Processing Duration (p99)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus" },
+          "expr": "histogram_quantile(0.99, sum by (topic, le) (rate(consumer_processing_duration_bucket[1m])))",
+          "legendFormat": "p99 {{topic}}"
+        }
+      ]
+    }
+  ],
+  "time": { "from": "now-15m", "to": "now" },
+  "refresh": "10s"
+}
