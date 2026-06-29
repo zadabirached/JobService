@@ -44,6 +44,35 @@ services:
     networks:
       - jobservice-net
 
+  replaytool:
+    build:
+      context: ../ReplayTool
+      dockerfile: Dockerfile
+    environment:
+      STORAGE_ROOT: /app/cases
+      JOBSERVICE_DB: "Host=postgres;Database=jobservice;Username=postgres;Password=postgres"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: guest
+      RabbitMQ__Password: guest
+      # Compose service hostnames ("postgres"/"rabbitmq") are not literally "localhost", so the
+      # LocalTargetGuard safety check would otherwise refuse them. This stack is a deliberately
+      # local dev/test environment, not a captured prod target, so the override is safe here.
+      REPLAY_ALLOW_REMOTE_DB: "true"
+    volumes:
+      - replay-cases:/app/cases
+    ports:
+      - "8081:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      jobservice:
+        condition: service_started
+    networks:
+      - jobservice-net
+
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -69,3 +98,6 @@ services:
 networks:
   jobservice-net:
     driver: bridge
+
+volumes:
+  replay-cases:
