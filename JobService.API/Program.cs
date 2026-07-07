@@ -34,10 +34,10 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((ctx, cfg) =>
     {
         var rabbitPort = builder.Configuration.GetValue<ushort>("RabbitMQ:Port", 5672);
-        cfg.Host(builder.Configuration["RabbitMQ:Host"], rabbitPort, "/", h =>
+        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "localhost", rabbitPort, "/", h =>
         {
-            h.Username(builder.Configuration["RabbitMQ:Username"]!);
-            h.Password(builder.Configuration["RabbitMQ:Password"]!);
+            h.Username(builder.Configuration["RabbitMQ:Username"] ?? "guest");
+            h.Password(builder.Configuration["RabbitMQ:Password"] ?? "guest");
         });
 
         cfg.ReceiveEndpoint("OrdersRoutingEvent-V2", e =>
