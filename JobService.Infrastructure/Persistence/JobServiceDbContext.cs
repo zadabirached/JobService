@@ -31,6 +31,9 @@ public class JobServiceDbContext : DbContext
             e.Property(x => x.Errors).HasColumnType("jsonb");
             e.Property(x => x.OperatingModes).HasColumnType("jsonb");
             e.HasOne(x => x.Job).WithMany(x => x.CustomerOrders).HasForeignKey(x => x.JobId);
+            // Supports GetCustomerOrdersUseCase's OrderId+TenantId lookup and ReplayTool's
+            // per-order existence check — both filter on OrderId with no index today.
+            e.HasIndex(x => x.OrderId);
         });
 
         modelBuilder.Entity<SystemOrder>(e =>
